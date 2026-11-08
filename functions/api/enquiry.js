@@ -60,12 +60,14 @@ export async function onRequestPost({request, env}) {
       redirect: 'error',
       signal: AbortSignal.timeout(8000)
     });
+    console.log('Formspree response', response.status)
     if (response.ok) return reply(200, {ok: true});
     if (response.status === 429) {
       return reply(429, {error: 'The form is busy. Wait a moment or email Marc directly.'});
     }
     return reply(502, {error: unavailable});
   } catch {
-    return reply(502, {error: 'We couldn’t confirm your request was sent. You can email Marc directly.'});
+    } catch (error) {
+  console.log('Formspree request failed:', error.name, error.message);
   }
 }
