@@ -1,4 +1,3 @@
-const recipient = 'marc@imovetoday.co.uk';
 const propertyTypes = new Set(['House', 'Flat or maisonette', 'Bungalow', 'Other']);
 const bedroomCounts = new Set(['Studio', '1', '2', '3', '4', '5+']);
 const postcodePattern = /^(?:GIR0AA|[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2})$/;
@@ -33,42 +32,40 @@ export async function onRequestPost({request, env}) {
   const property = read('property');
   const bedrooms = read('bedrooms');
   const notes = read('notes');
-  const requestId = request.headers.get('Idempotency-Key') ?? '';
   if (read('website')) return reply(200, {ok: true});
   if (!name || name.length > 80 || /[\r\n]/.test(name) ||
       email.length > 120 || !emailPattern.test(email) ||
       !postcodePattern.test(postcode) || !propertyTypes.has(property) ||
-      !bedroomCounts.has(bedrooms) || notes.length > 1000 ||
-      !/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(requestId)) {
+      !bedroomCounts.has(bedrooms) || notes.length > 1000) {
     return reply(400, {error: 'Check your name, email and property details, then try again.'});
   }
-  if (!env.RESEND_API_KEY || !env.ENQUIRY_FROM) return reply(503, {error: unavailable});
+  const formId = env.FORMSPREE_FORM_ID?.trim();
+  if (!formId || !/^[a-z0-9]+$/i.test(formId)) {
+    return reply(503, {error: unavailable});
+  }
 
-  const formattedPostcode = postcode.slice(0, -3) + ' ' + postcode.slice(-3);
+  const submission = new FormData();
+  submission.set('name', name);
+  submission.set('email', email);
+  submission.set('postcode', postcode.slice(0, -3) + ' ' + postcode.slice(-3));
+  submission.set('property', property);
+  submission.set('bedrooms', bedrooms);
+  submission.set('message', notes);
+
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await fetch('https://formspree.io/f/' + formId, {
       method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + env.RESEND_API_KEY,
-        'Content-Type': 'application/json',
-        'Idempotency-Key': 'imove-epc/' + requestId
-      },
-      body: JSON.stringify({
-        from: env.ENQUIRY_FROM,
-        to: [recipient],
-        reply_to: email,
-        subject: 'New iMove EPC quote request · ' + formattedPostcode,
-        text: [
-          'Name: ' + name, 'Email: ' + email, 'Postcode: ' + formattedPostcode,
-          'Property type: ' + property, 'Bedrooms: ' + bedrooms, '',
-          'Additional details:', notes || 'None provided'
-        ].join('\n')
-      }),
+      headers: {Accept: 'application/json'},
+      body: submission,
+      redirect: 'error',
       signal: AbortSignal.timeout(8000)
     });
     if (response.ok) return reply(200, {ok: true});
+    if (response.status === 429) {
+      return reply(429, {error: 'The form is busy. Wait a moment or email Marc directly.'});
+    }
+    return reply(502, {error: unavailable});
   } catch {
-    // The browser retains the request ID so retrying an identical request is safe.
+    return reply(502, {error: 'We couldn’t confirm your request was sent. You can email Marc directly.'});
   }
-  return reply(502, {error: unavailable});
 }
