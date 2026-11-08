@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#59276a">
+<meta name="description" content="Request a domestic Energy Performance Certificate (EPC) quote from iMove EPC. Contact Marc to check coverage, confirm the price and arrange a visit.">
+<title>iMove EPC | Domestic Energy Performance Certificates</title>
+<link rel="icon" href="/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<script src="/quote.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site"><div class="wrap">
+<a class="wordmark" href="/" aria-label="iMove EPC home"><img src="/mark.svg" width="42" height="42" alt=""><span>iMove EPC</span></a>
+<nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#faq">FAQs</a><a class="cta" href="#quote">Get a quote</a></nav>
+</div></header>
+<main id="main" class="wrap">
+<section class="hero" aria-labelledby="hero-heading">
+<div><span class="kicker">Domestic Energy Performance Certificates</span><h1 id="hero-heading">One less thing on your moving list.</h1><p>Selling or letting a home? Get an EPC quote from Marc. Share the property postcode and a few details to check coverage, confirm the price and arrange a visit.</p><div class="hero-actions"><a class="cta" href="#quote">Request an EPC quote</a><a href="tel:+447561476836">Call 07561 476836</a></div></div>
+<figure class="hero-visual">
+<svg viewBox="0 0 480 315" fill="none" aria-hidden="true">
+<path d="M54 230c0-91 74-165 165-165h191v85c0 65-53 118-118 118H54z" fill="#ddc8e5"/><path d="M84 250h338M109 231h283" stroke="currentColor" stroke-opacity=".35"/>
+<path d="M154 226v-83l91-72 91 72v83z" fill="#fdf8fe" stroke="#622b75" stroke-width="2"/>
+<path d="M144 149l101-78 101 78M179 169h29v29h-29zm105 0h29v29h-29zM227 226v-57h35v57" stroke="#622b75" stroke-width="2" stroke-linejoin="round"/>
+<path d="M262 77c31-12 73-9 104 8s48 48 43 75c-3 21-19 38-45 49" stroke="#9b58ac" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 8"/><circle cx="368" cy="207" r="9" fill="#622b75"/>
+</svg>
+<figcaption class="fig-label">Ready for the next move</figcaption>
+</figure>
+</section>
+<div class="context"><span>For homeowners and landlords</span><span>Domestic EPC assessments</span><span>Digital certificate</span></div>
+<section class="section" id="how">
+<span class="kicker">How it works</span><h2>From postcode to certificate.</h2>
+<div class="steps">
+<article class="step"><span>01</span><h3>Tell us about the property</h3><p>Share the postcode, property type and bedroom count so Marc can confirm coverage and price.</p></article>
+<article class="step"><span>02</span><h3>Arrange a visit</h3><p>Agree a time with Marc and make sure he can access the rooms, heating controls and loft if needed.</p></article>
+<article class="step"><span>03</span><h3>Get your certificate</h3><p>After the assessment, you’ll receive a digital copy of your Energy Performance Certificate.</p></article>
+</div>
+</section>
+<section class="section quote" id="quote">
+<div><span class="kicker">Get a quote</span><h2>Tell us what you need.</h2><p class="form-intro">Start with the property details. Marc will reply by email to confirm whether he covers the postcode and what the assessment will cost.</p>
+<div class="contact"><strong>Prefer to get in touch directly?</strong><a href="tel:+447561476836">07561 476836</a><a href="mailto:marc@imovetoday.co.uk">marc@imovetoday.co.uk</a></div></div>
+<div>
+<form id="quote-form" method="post" action="/api/enquiry">
+<div class="fields">
+<label for="name">Your name<input id="name" name="name" autocomplete="name" maxlength="80" required></label>
+<label for="email">Email address<input id="email" name="email" type="email" autocomplete="email" maxlength="120" required></label>
+<label for="postcode">Property postcode<input id="postcode" name="postcode" placeholder="e.g. FY6 7AA" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" required></label>
+<label for="property">Property type<select id="property" name="property" required><option value="">Choose a type</option><option>House</option><option>Flat or maisonette</option><option>Bungalow</option><option>Other</option></select></label>
+<label for="bedrooms">Bedrooms<select id="bedrooms" name="bedrooms" required><option value="">Choose a number</option><option>Studio</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></label>
+<label for="notes" class="full">Anything else? <span class="optional">(optional)</span><textarea id="notes" name="notes" maxlength="1000" rows="3"></textarea></label>
+</div>
+<div class="trap" aria-hidden="true"><label for="website">Leave this field blank</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+<p class="muted form-note">iMove EPC uses these details to respond to your enquiry.</p>
+<div class="form-foot"><button class="primary" id="send" type="submit" disabled>Send quote request</button></div>
+<p id="form-error" class="form-error" role="alert"></p>
+<noscript><p>To send your request, <a href="mailto:marc@imovetoday.co.uk">email Marc directly</a> or enable JavaScript.</p></noscript>
+</form>
+<div class="result" id="confirmation" tabindex="-1" hidden><h3 id="result-title"></h3><p class="muted" id="result-copy"></p><button class="primary" id="again" type="button"></button></div>
+</div>
+</section>
+<section class="section faq" id="faq">
+<span class="kicker">Before you book</span><h2>EPC questions.</h2>
+<details><summary>What does an EPC tell me?</summary><p>It gives your property an energy efficiency rating from A to G and suggests ways to improve its efficiency.</p></details>
+<details><summary>How can I check whether I already have an EPC?</summary><p>Search for your property on the <a href="https://www.gov.uk/find-energy-certificate">GOV.UK energy certificate register</a>.</p></details>
+<details><summary>How much will it cost?</summary><p>Share your property details and Marc will confirm the price before you arrange a visit.</p></details>
+<details><summary>Which postcodes do you cover?</summary><p>Send your postcode or give Marc a call to check whether he covers your area.</p></details>
+</section>
+</main>
+<footer><div class="wrap"><strong>iMove EPC</strong><a href="mailto:marc@imovetoday.co.uk">marc@imovetoday.co.uk</a><a href="tel:+447561476836">07561 476836</a></div></footer>
+</body>
+</html>
