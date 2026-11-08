@@ -3,7 +3,10 @@ const bedroomCounts = new Set(['Studio', '1', '2', '3', '4', '5+']);
 const postcodePattern = /^(?:GIR0AA|[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2})$/;
 const emailPattern = /^[^\s@<>(),;:\x00-\x1F\x7F]+@[^\s@<>(),;:\x00-\x1F\x7F]+\.[^\s@<>(),;:\x00-\x1F\x7F]+$/;
 const unavailable = 'We couldn’t send your request. Try again or email Marc directly.';
-const reply = (status, payload) => Response.json(payload, {status, headers: {'Cache-Control': 'no-store'}});
+const reply = (status, payload) => Response.json(payload, {
+  status,
+  headers: {'Cache-Control': 'no-store'}
+});
 
 export async function onRequestPost({request, env}) {
   if (request.headers.get('Origin') !== new URL(request.url).origin) {
@@ -32,6 +35,7 @@ export async function onRequestPost({request, env}) {
   const property = read('property');
   const bedrooms = read('bedrooms');
   const notes = read('notes');
+
   if (read('website')) return reply(200, {ok: true});
   if (!name || name.length > 80 || /[\r\n]/.test(name) ||
       email.length > 120 || !emailPattern.test(email) ||
@@ -39,8 +43,10 @@ export async function onRequestPost({request, env}) {
       !bedroomCounts.has(bedrooms) || notes.length > 1000) {
     return reply(400, {error: 'Check your name, email and property details, then try again.'});
   }
+
   const formId = env.FORMSPREE_FORM_ID?.trim();
   if (!formId || !/^[a-z0-9]+$/i.test(formId)) {
+    console.warn('Formspree configuration missing or invalid');
     return reply(503, {error: unavailable});
   }
 
@@ -57,17 +63,18 @@ export async function onRequestPost({request, env}) {
       method: 'POST',
       headers: {Accept: 'application/json'},
       body: submission,
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(8000)
     });
-    console.log('Formspree response', response.status)
+
+    console.log('Formspree response:', response.status);
     if (response.ok) return reply(200, {ok: true});
     if (response.status === 429) {
       return reply(429, {error: 'The form is busy. Wait a moment or email Marc directly.'});
     }
     return reply(502, {error: unavailable});
-  } catch {
-    } catch (error) {
-  console.log('Formspree request failed:', error.name, error.message);
+  } catch (error) {
+    console.error('Formspree request failed:', error.name, error.message);
+    return reply(502, {error: 'We couldn’t confirm your request was sent. You can email Marc directly.'});
   }
 }
