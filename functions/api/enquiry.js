@@ -3,10 +3,7 @@ const bedroomCounts = new Set(['Studio', '1', '2', '3', '4', '5+']);
 const postcodePattern = /^(?:GIR0AA|[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2})$/;
 const emailPattern = /^[^\s@<>(),;:\x00-\x1F\x7F]+@[^\s@<>(),;:\x00-\x1F\x7F]+\.[^\s@<>(),;:\x00-\x1F\x7F]+$/;
 const unavailable = 'We couldn’t send your request. Try again or email Marc directly.';
-const reply = (status, payload) => Response.json(payload, {
-  status,
-  headers: {'Cache-Control': 'no-store'}
-});
+const reply = (status, payload) => Response.json(payload, {status, headers: {'Cache-Control': 'no-store'}});
 
 export async function onRequestPost({request, env}) {
   if (request.headers.get('Origin') !== new URL(request.url).origin) {
@@ -35,15 +32,15 @@ export async function onRequestPost({request, env}) {
   const property = read('property');
   const bedrooms = read('bedrooms');
   const notes = read('notes');
-
+  const phone = read('phone');
   if (read('website')) return reply(200, {ok: true});
   if (!name || name.length > 80 || /[\r\n]/.test(name) ||
       email.length > 120 || !emailPattern.test(email) ||
       !postcodePattern.test(postcode) || !propertyTypes.has(property) ||
-      !bedroomCounts.has(bedrooms) || notes.length > 1000) {
+      !bedroomCounts.has(bedrooms) || notes.length > 1000 ||
+      phone.length > 40 || /[\r\n]/.test(phone)) {
     return reply(400, {error: 'Check your name, email and property details, then try again.'});
   }
-
   const formId = env.FORMSPREE_FORM_ID?.trim();
   if (!formId || !/^[a-z0-9]+$/i.test(formId)) {
     console.warn('Formspree configuration missing or invalid');
@@ -57,6 +54,7 @@ export async function onRequestPost({request, env}) {
   submission.set('property', property);
   submission.set('bedrooms', bedrooms);
   submission.set('message', notes);
+  if (phone) submission.set('phone', phone);
 
   try {
     const response = await fetch('https://formspree.io/f/' + formId, {
@@ -66,7 +64,6 @@ export async function onRequestPost({request, env}) {
       redirect: 'manual',
       signal: AbortSignal.timeout(8000)
     });
-
     console.log('Formspree response:', response.status);
     if (response.ok) return reply(200, {ok: true});
     if (response.status === 429) {
