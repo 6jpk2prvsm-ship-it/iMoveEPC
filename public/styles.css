@@ -66,13 +66,28 @@ button,input,select,textarea{font:inherit}
 .result p{margin-top:6px}
 footer .wrap{display:flex;gap:8px 22px;flex-wrap:wrap}
 
-.hero-visual.company-logo{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:0;aspect-ratio:auto;padding:clamp(12px,2vw,25px)}
-.company-logo img{display:block;width:100%;height:auto;object-fit:contain}
+
+
+
+.wordmark .brand-logo {
+  display: block;
+  width: 180px;
+  height: auto;
+}
+header.site .wrap {
+  padding-block: 10px;
+}
+.hero {
+  display: block;
+}
+.hero h1 {
+  max-width: 16ch;
+}
+.hero p {
+  max-width: 58ch;
+}
 @media (max-width: 760px) {
-  .hero-visual.company-logo {
-    width: min(100%, 320px);
-    justify-self: center;
-    padding: 10px;
-    border-radius: 12px;
+  .wordmark .brand-logo {
+    width: 150px;
   }
 }
